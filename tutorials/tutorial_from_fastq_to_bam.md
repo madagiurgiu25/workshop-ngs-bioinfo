@@ -75,7 +75,7 @@ workshop-ngs-bioinfo2025
 
 ## 2. Prepare Reference Genome
 
-For this workshop, we will focus on **chr5, chr7, chr13, chr17, and chrX**.
+For this workshop, we will focus on **chr5, chr7, chr13, chr17, and chrX**, covering the following genes: SMN2, SMN1, PSM2, BRCA2, BRCA1, DMD.
 Working with a reduced reference genome will save both time and disk space.
 
 Use `samtools` to extract only these chromosomes:

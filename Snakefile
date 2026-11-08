@@ -1,6 +1,7 @@
 #############################################
 # Run with:
-# snakemake --cores 4 --config R1=data/raw_fastq/HG00171_female_ERR034564_1.cut.fastq.gz R2=data/raw_fastq/HG00171_female_ERR034564_2.cut.fastq.gz ref=data/index/GRCh38.primary_assembly.genome.cut.fa outdir=results/HG00171_female_ERR034564
+# snakemake --cores 4 --config R1=data/raw_fastq/HG00171_female_ERR034564_1.cut.fastq.gz R2=data/raw_fastq/HG00171_female_ERR034564_2.cut.fastq.gz ref=data/index/GRCh38.primary_assembly.genome.cut.fa outdir=results/HG00171_female_ERR034564 sample=HG00171_female_ERR034564
+# snakemake --cores 4 --config R1=data/raw_fastq/HG00152_male_SRR769545_1.cut.fastq.gz R2=data/raw_fastq/HG00152_male_SRR769545_2.cut.fastq.gz ref=data/index/GRCh38.primary_assembly.genome.cut.fa outdir=results/HG00152_male_SRR769545 sample=HG00152_male_SRR769545 
 #############################################
 
 configfile: "config.yaml"

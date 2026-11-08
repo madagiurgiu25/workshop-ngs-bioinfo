@@ -121,9 +121,14 @@ gunzip GRCh38.primary_assembly.genome.fa.gz
 
 We’ll use two example datasets from the **Coriell Institute** [https://www.coriell.org/], `HG00152` and `HG00171`. The raw data is Illumina short-read, paired-end whole-exome sequencing (WES) and you can find this on <b>The International Genome Sample Resource (IGSR)</b> platform [https://www.internationalgenome.org/data-portal/sample]. 
 
-For practicality, in the workshop we will work only with regions from a subset of genes. The modified FASTQ files can be downloaded from [Raw_FastQ_OnTarget_Coriell](https://drive.google.com/drive/folders/1SkdkNAYHLzGYi57na-aEVs6usgAapxqI?usp=sharing)
+For practicality, in the workshop we will work only with regions from a subset of genes: APC, BRCA1, BRCA2, PMS2, DMD, spanning chr5,chr7,chr13,chr17,chrX. The modified FASTQ files can be downloaded from [Raw_FastQ_OnTarget_Coriell](https://zenodo.org/records/17598455)
 
-
+```
+wget https://zenodo.org/records/17598455/files/HG00152_male_SRR769545_1.cut.fastq.gz
+wget https://zenodo.org/records/17598455/files/HG00152_male_SRR769545_2.cut.fastq.gz
+wget https://zenodo.org/records/17598455/files/HG00171_female_ERR034564_1.cut.fastq.gz
+wget https://zenodo.org/records/17598455/files/HG00171_female_ERR034564_2.cut.fastq.gz
+```
 
 ## You’re Ready!
 

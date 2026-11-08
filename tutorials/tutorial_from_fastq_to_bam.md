@@ -357,6 +357,8 @@ picard CollectAlignmentSummaryMetrics \
 python ../picard_summary.py -o dedup/{sample}.alignment_summary.png dedup/${sample}.alignment_summary.txt
 ```
 
+<img src="img/HG00171_female_ERR034564.alignment_summary.png" alt="HG00171_female_ERR034564" width="70%">
+
 ### 9.2 Keep Only Properly Paired Reads
 
 Filter BAM such that only properly-paired reads are kept. To understand this step check the [SAM Flag encoding](https://broadinstitute.github.io/picard/explain-flags.html).

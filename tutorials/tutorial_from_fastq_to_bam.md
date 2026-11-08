@@ -351,8 +351,10 @@ sample=HG00171_female_ERR034564
 
 picard CollectAlignmentSummaryMetrics \
     R=index/GRCh38.primary_assembly.genome.cut.fa \
-    I=dedup/${sample}.dedup.sorted.bam \
+    I=dedup/${sample}.dedup.bam \
     O=dedup/${sample}.alignment_summary.txt
+
+python ../picard_summary.py -o dedup/{sample}.alignment_summary.png dedup/${sample}.alignment_summary.txt
 ```
 
 ### 9.2 Keep Only Properly Paired Reads

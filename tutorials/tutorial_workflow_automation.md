@@ -12,9 +12,9 @@ This repository contains a reproducible **bioinformatics workflow** implemented 
 ## 2. Setup
 
 ```
-git clone https://github.com/madagiurgiu25/workshop-ngs-bioinfo2025.git
+git clone https://github.com/madagiurgiu25/workshop-ngs-bioinfo.git
 
-cd workshop-ngs-bioinfo2025
+cd workshop-ngs-bioinfo
 mkdir -p data/raw_fastq && mkdir -p data/index
 ```
 
@@ -24,22 +24,22 @@ Bioinformatics packages (see [tutorial_install.md](tutorial_install.md)).
 After having the environment please do:
 
 ```bash
-conda activate bioinfo2025
+conda activate bioinfo2026
 ```
 
 ### 2.2 Download input data
-Download the raw fastq from [zenodo](https://zenodo.org/records/17598455) and place them under `workshop-ngs-bioinfo2025/data/raw_fastq`.
+Download the raw fastq from [zenodo](https://zenodo.org/records/17598455) and place them under `workshop-ngs-bioinfo/data/raw_fastq`.
 
 ### 2.3 Prepare reference genome
 
-Check [Step 2](https://github.com/madagiurgiu25/workshop-ngs-bioinfo2025/blob/main/tutorials/tutorial_from_fastq_to_bam.md#2-prepare-reference-genome) in [tutorial_from_fastq_to_bam.md](tutorial_from_fastq_to_bam.md).
+Check [Step 2](https://github.com/madagiurgiu25/workshop-ngs-bioinfo/blob/main/tutorials/tutorial_from_fastq_to_bam.md#2-prepare-reference-genome) in [tutorial_from_fastq_to_bam.md](tutorial_from_fastq_to_bam.md).
 
-And move this trimmed reference genome under `workshop-ngs-bioinfo2025/data/index`.
+And move this trimmed reference genome under `workshop-ngs-bioinfo/data/index`.
 
 ### 2.4 Project structure
 
 ```
-workshop-ngs-bioinfo2025/
+workshop-ngs-bioinfo/
 ├── Snakefile
 ├── config.yaml
 ├── data/

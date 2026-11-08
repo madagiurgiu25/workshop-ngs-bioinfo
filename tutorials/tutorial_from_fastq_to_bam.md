@@ -9,7 +9,7 @@ In this tutorial, you will learn how to **analyze NGS (Next-Generation Sequencin
 
 To illustrate the process, we will use **2×Coriell** data, HG00171 and HG00152, sequenced using **Whole Exome Sequencing (WES)**, freely downlable from [https://www.internationalgenome.org/data-portal/sample](https://www.internationalgenome.org/data-portal/sample).
 
-For practicality, this dataset was trimmed to include only a few genes, effectively **emulating a Panel Sequencing dataset**. You can download these trimmed raw fastq raw from [zenodo](https://zenodo.org/records/17598455) and place them under `workshop-ngs-bioinfo2025/data/raw_fastq`. 
+For practicality, this dataset was trimmed to include only a few genes, effectively **emulating a Panel Sequencing dataset**. You can download these trimmed raw fastq raw from [zenodo](https://zenodo.org/records/17598455) and place them under `workshop-ngs-bioinfo/data/raw_fastq`. 
 
 ## Table of Contents
 
@@ -30,12 +30,12 @@ For practicality, this dataset was trimmed to include only a few genes, effectiv
 
 - [7. Perform Alignment Using BWA and Sort](#7-perform-alignment-using-bwa-and-sort)
 
-- [8. Compute Coverage Track](#8-compute-coverage-track)
+- [8. Deduplication and Quality Control](#8-deduplication-and-quality-control)
+  - [8.1 Mark and Remove Duplicates with Picard](#81-mark-and-remove-duplicates-with-picard)
+  - [8.2 Keep Only Properly Paired Reads](#82-keep-only-properly-paired-reads)
+  - [8.3 Run Final QC on Cleaned BAM Files](#83-run-final-qc-on-cleaned-bam-files)
 
-- [9. Deduplication and Quality Control](#9-deduplication-and-quality-control)
-  - [9.1 Mark and Remove Duplicates with Picard](#91-mark-and-remove-duplicates-with-picard)
-  - [9.2 Keep Only Properly Paired Reads](#92-keep-only-properly-paired-reads)
-  - [9.3 Run Final QC on Cleaned BAM Files](#93-run-final-qc-on-cleaned-bam-files)
+- [9. Compute Coverage Track](#9-compute-coverage-track)
 
 ---
 
@@ -46,8 +46,11 @@ For practicality, this dataset was trimmed to include only a few genes, effectiv
 ### 1.1 Clone the Repository
 
 ```
-git clone https://github.com/madagiurgiu25/workshop-ngs-bioinfo2025.git
+git clone https://github.com/madagiurgiu25/workshop-ngs-bioinfo.git
+cd workshop-ngs-bioinfo
 ```
+
+From now on the working directory will be the `workshop-ngs-bioinfo`.
 
 ### 1.2 Install Required Tools
 
@@ -62,7 +65,7 @@ conda activate bioinfo2025
 Download the input data in FASTQ format and the GRCh38/hg38 GENCODE human reference genome by following the steps in [tutorial_install.md](tutorial_install.md). Make sure your data structure is organized like:
 
 ```
-workshop-ngs-bioinfo2025
+workshop-ngs-bioinfo
     ├── data
         ├── index
         │   ├── GRCh38.primary_assembly.genome.fa
@@ -82,7 +85,7 @@ Use `samtools` to extract only these chromosomes:
 
 ```bash
 # Create index for the reference genome (useful for quick access to sequence for e.g. IGV, GATK, samtools)
-cd workshop-ngs-bioinfo2025/data/index
+cd workshop-ngs-bioinfo/data/index
 samtools faidx GRCh38.primary_assembly.genome.fa
 
 # Select chromosomes of interest
@@ -95,7 +98,7 @@ samtools faidx GRCh38.primary_assembly.genome.cut.fa
 After this step, you should have the following files:
 
 ```
-└── workshop-ngs-bioinfo2025
+└── workshop-ngs-bioinfo
     ├── data
         ├── index
             ├── GRCh38.primary_assembly.genome.fa
@@ -110,7 +113,7 @@ After this step, you should have the following files:
 In this step, you will check the quality of your raw FASTQ data.
 
 ```bash
-cd workshop-ngs-bioinfo2025/data
+cd workshop-ngs-bioinfo/data
 mkdir -p fastqc_reports
 
 # Run FastQC
@@ -123,7 +126,7 @@ multiqc fastqc_reports -o multiqc_report
 After this step, you should have the following reports:
 
 ```
-└── workshop-ngs-bioinfo2025
+└── workshop-ngs-bioinfo
     ├── data
         ├── fastqc_reports
             ├── HG00152_male_SRR769545_1.cut_fastqc.html
@@ -150,7 +153,7 @@ This also accounts for ambiguous bases (Ns), which typically correspond to low-q
 Run on your dataset:
 
 ```bash
-cd workshop-ngs-bioinfo2025/data
+#cd workshop-ngs-bioinfo/data
 mkdir -p trimmed_fastq
 
 # Trim HG00171
@@ -167,7 +170,7 @@ raw_fastq/HG00152_male_SRR769545_2.cut.fastq.gz
 After this step you should have the following files:
 
 ```bash
-└── workshop-ngs-bioinfo2025
+└── workshop-ngs-bioinfo
     ├── data
         └── trimmed_fastq
             ├── HG00152_male_SRR769545_1.cut.fastq.gz_trimming_report.txt
@@ -193,7 +196,7 @@ After this step you should have the following files:
 We rerun FastQC in combination with MultiQC for completeness.
 
 ```bash
-cd workshop-ngs-bioinfo2025/data
+#cd workshop-ngs-bioinfo/data
 mkdir -p fastqc_reports_trimmed
 fastqc -t 4 -o fastqc_reports_trimmed trimmed_fastq/*.fq.gz
 multiqc fastqc_reports_trimmed -o multiqc_report_trimmed
@@ -202,7 +205,7 @@ multiqc fastqc_reports_trimmed -o multiqc_report_trimmed
 Note that the QC file `data/trimmed_fastq/HG00152_male_SRR769545_1.cut_val_1_fastqc.html` generated on the fly while running `trim_galore` should contain same information as the `data/fastqc_reports_trimmed/HG00152_male_SRR769545_1.cut_val_1_fastqc.html` (similar for the other trimmed files).
 
 ```bash
-└── workshop-ngs-bioinfo2025
+└── workshop-ngs-bioinfo
     ├── data
         ├── multiqc_report_trimmed
             ├── multiqc_data
@@ -227,14 +230,14 @@ This process generates the required `.bwt`, `.pac`, `.ann`, `.amb`, and `.sa` fi
 
 ```bash
 # Create mapping index (this may take a while)
-cd workshop-ngs-bioinfo2025/data
+#cd workshop-ngs-bioinfo/data
 bwa index index/GRCh38.primary_assembly.genome.cut.fa
 ```
 
 Output:
 
 ```bash
-└── workshop-ngs-bioinfo2025
+└── workshop-ngs-bioinfo
     ├── data
         ├── index
             ├── GRCh38.primary_assembly.genome.cut.fa
@@ -254,7 +257,7 @@ We align next the reads to the reference genome using `bwa`. After this step a `
 Example for **HG00171**:
 
 ```bash
-cd workshop-ngs-bioinfo2025/data
+cd workshop-ngs-bioinfo/data
 mkdir -p mapping
 
 # Setup input
@@ -274,7 +277,7 @@ samtools index mapping/${sample}.sorted.bam
 Repeat this step for `HG00152_male_SRR769545` sample. As result you should have following files:
 
 ```
-└── workshop-ngs-bioinfo2025
+└── workshop-ngs-bioinfo
     ├── data
     ├── mapping
         ├── HG00152_male_SRR769545.bam
@@ -285,20 +288,10 @@ Repeat this step for `HG00152_male_SRR769545` sample. As result you should have 
         ├── HG00171_female_ERR034564.sorted.bam.bai
 ```
 
-## 8. Compute Coverage Track
-
-Create a BigWig coverage file for visualization in IGV:
-
-```bash
-cd workshop-ngs-bioinfo2025/data
-sample=HG00171_female_ERR034564
-bamCoverage -b mapping/${sample}.sorted.bam -o mapping/${sample}.sorted.coverage.bw
-```
-
 Repeat this step for `HG00152_male_SRR769545` sample.
 
 
-## 9. Deduplication and Quality Control
+## 8. Deduplication and Quality Control
 
 We need deduplication in NGS data analysis to remove duplicate reads that arise not from biology, but from the sequencing process — mainly during PCR amplification in library preparation. Additionally, we want to keep only reads which are "properly-paired", i.e. remove unmapped, singletons or other reads. This will make the dataset more reliable for the downstream analysis, i.e. SNV and INDELs calling. 
 
@@ -310,10 +303,10 @@ In this step we will:
 - sort and index 
 - run quality checks on the cleaned BAM files
 
-### 9.1 Mark and Remove Duplicates with Picard
+### 8.1 Mark and Remove Duplicates with Picard
 
 ```bash
-cd workshop-ngs-bioinfo2025/data
+# cd workshop-ngs-bioinfo/data
 mkdir -p dedup
 
 sample=HG00171_female_ERR034564
@@ -332,7 +325,7 @@ samtools index dedup/${sample}.dedup.bam
 Your deduplicated files should look as following:
 
 ```bash
-└── workshop-ngs-bioinfo2025
+└── workshop-ngs-bioinfo
     ├── data
         ├── dedup
             ├── HG00152_male_SRR769545.dedup.bam
@@ -346,7 +339,7 @@ Your deduplicated files should look as following:
 Assess alignment and duplication statistics with **Picard QC metrics**:
 
 ```bash
-cd workshop-ngs-bioinfo2025/data
+cd workshop-ngs-bioinfo/data
 sample=HG00171_female_ERR034564
 
 picard CollectAlignmentSummaryMetrics \
@@ -359,12 +352,12 @@ python ../picard_summary.py -o dedup/{sample}.alignment_summary.png dedup/${samp
 
 <img src="img/HG00171_female_ERR034564.alignment_summary.png" alt="HG00171_female_ERR034564" width="70%">
 
-### 9.2 Keep Only Properly Paired Reads
+### 8.2 Keep Only Properly Paired Reads
 
 Filter BAM such that only properly-paired reads are kept. To understand this step check the [SAM Flag encoding](https://broadinstitute.github.io/picard/explain-flags.html).
 
 ```bash
-cd workshop-ngs-bioinfo2025/data
+cd workshop-ngs-bioinfo/data
 mkdir -p ppaired
 sample=HG00171_female_ERR034564
 
@@ -383,7 +376,7 @@ Repeat steps above for `HG00152_male_SRR769545` sample.
 After these step you should have:
 
 ```
-workshop-ngs-bioinfo2025
+workshop-ngs-bioinfo
 ├── data
     ├── ppaired
         ├── HG00152_male_SRR769545.proper.bam
@@ -395,12 +388,12 @@ workshop-ngs-bioinfo2025
 
 ```
 
-### 9.3 Run Final QC on Cleaned BAM Files
+### 8.3 Run Final QC on Cleaned BAM Files
 
 Finally, run **FastQC** and **MultiQC** again on the cleand BAM (deduplicated+properly-paired). For this we need to convert the BAM to FASTQ:
 
 ```bash
-cd workshop-ngs-bioinfo2025/data
+cd workshop-ngs-bioinfo/data
 
 sample=HG00171_female_ERR034564
 samtools fastq ppaired/${sample}.proper.sorted.bam -1 ppaired/${sample}.proper_R1.fastq -2 ppaired/${sample}.proper_R2.fastq
@@ -413,5 +406,14 @@ fastqc -t 4 -o fastqc_reports_clean ppaired/*.fastq
 multiqc fastqc_reports_clean -o multiqc_report_clean
 ```
 
+## 9. Compute Coverage Track
 
+Create a BigWig coverage file for visualization in IGV:
+
+```bash
+#cd workshop-ngs-bioinfo/data
+sample=HG00171_female_ERR034564
+bamCoverage -b ppaired/${sample}.proper.sorted.bam -o mapping/${sample}.coverage.bw
+```
+Repeat steps above for `HG00152_male_SRR769545` sample.
 

@@ -71,7 +71,7 @@ Create a Conda environment containing all the bioinformatics tools necessary for
 ### Run the following command:
 
 ```bash
-conda create -n bioinfo2025 -c conda-forge -c bioconda \
+conda create -n bioinfo2026 -c conda-forge -c bioconda \
   python==3.10 \
   fastqc==0.11.8 \
   trim-galore==0.6.10 \
@@ -89,7 +89,7 @@ conda create -n bioinfo2025 -c conda-forge -c bioconda \
 Once installed, activate the environment:
 
 ```bash
-conda activate bioinfo2025
+conda activate bioinfo2026
 ```
 
 Check that tools are accessible, e.g.:
